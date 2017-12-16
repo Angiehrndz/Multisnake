@@ -1,36 +1,72 @@
 import pygame
 from pygame.locals import *
 
+PIXELS_PER_GRID = 20
+
 class Snake:
     def __init__(self, startingCoordinate, startingDirection):
         self.chain = [startingCoordinate]
+        for i in range(3):
+            n = [startingCoordinate[0]-i-1, startingCoordinate[1]]
+            self.chain.append(n)
+
         self.direction = startingDirection
+        self.speed = 1000
 
-    def on_loop(self):
-        pass
+        self.speedtimer = 0
 
-    def on_render(self):
-        pass
+    def on_loop(self, deltaTicks):
+        self.speedtimer += deltaTicks
+        if self.speedtimer > self.speed:
+            self.speedtimer = 0
+            self.update()
+
+    def update(self):
+
+        for i in reversed(range(len(self.chain))):
+            if i!= 0:
+                self.chain[i][0] = self.chain[i-1][0]
+                self.chain[i][1] = self.chain[i-1][1]
+
+        if self.direction == 0:
+            self.chain[0][0] += 1
+        if self.direction == 1:
+            self.chain[0][1] += 1
+        if self.direction == 2:
+            self.chain[0][0] += -1
+        if self.direction == 3:
+            self.chain[0][1] += -1
+
+
+    def on_render(self, screen):
+        for i in range(len(self.chain)):
+            rect = (self.chain[i][0] * PIXELS_PER_GRID, self.chain[i][1] * PIXELS_PER_GRID, PIXELS_PER_GRID, PIXELS_PER_GRID)
+            if i == 0:
+                pygame.draw.rect(screen, [100, 100, 100], rect, 0)
+            else:
+                pygame.draw.rect(screen, [75, 75, 75], rect, 0)
 
     def setDirection(self, direction):
-        if (self.direction - direction) %2 != 0:
+        if (self.direction - direction)%2 != 0:
             self.direction = direction
-        print(str(direction) + " " +str(self.direction))
 
 
 class Game:
     def __init__(self, gridSize):
         self._running = True
         self._display_surf = None
-        self.size = self.width, self.height = 20*gridSize[0], 20*gridSize[1]
+        self.size = self.width, self.height = PIXELS_PER_GRID*gridSize[0], PIXELS_PER_GRID*gridSize[1]
         self.gridSize = gridSize
+
+        self.ticksPassed = 0
+        self.deltaTicks = 0
 
     def on_init(self):
         pygame.init()
         self._display_surf = pygame.display.set_mode(self.size, pygame.HWSURFACE | pygame.DOUBLEBUF)
         self._running = True
 
-        self.ownSnake = Snake([0,0], 0)
+        self.ownSnake = Snake([10,0], 0)
         self.otherSnakes = []
 
     def on_event(self, event):
@@ -47,16 +83,23 @@ class Game:
                 self.ownSnake.setDirection(1)
 
     def on_loop(self):
-        self.ownSnake.on_loop()
+        self.deltaTicks = pygame.time.get_ticks() - self.ticksPassed
+        self.ticksPassed = pygame.time.get_ticks()
+
+        self.ownSnake.on_loop(self.deltaTicks)
 
         for i in self.otherSnakes:
-            i.on_loop()
+            i.on_loop(self.deltaTicks)
 
     def on_render(self):
-        self.ownSnake.on_render()
+        self._display_surf.fill([0, 0, 0])
+
+        self.ownSnake.on_render(self._display_surf)
 
         for i in self.otherSnakes:
-            i.on_render()
+            i.on_render(self._display_surf)
+
+        pygame.display.flip()
 
     def on_cleanup(self):
         pygame.quit()
