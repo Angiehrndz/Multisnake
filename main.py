@@ -59,8 +59,7 @@ class Snake:
         collided = self.game.snakeCollision(self)
 
         if type(collided) == Snake:
-            if collided != self:
-                self.kill()
+            self.kill(collided)
 
     def on_render(self, screen):
         for i in range(len(self.chain)):
@@ -74,8 +73,13 @@ class Snake:
         if (self.direction - direction)%2 != 0:
             self.direction = direction
 
-    def kill(self):
-        print("NOW I WILL KILL MYSELF! D:")
+    def kill(self, killedBy = None):
+        if killedBy == self:
+            print("I SUICIDED")
+        elif killedBy == None:
+            print("Killed by the world")
+        else:
+            print("I HAVE BEEN MURDERED")
 
 
 class Game:
