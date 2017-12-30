@@ -85,6 +85,17 @@ class Snake:
         else:
             print("I HAVE BEEN MURDERED")
 
+class Food:
+    def __init__(self, game, coord):
+        self.coord = coord
+        self.game = game
+
+        self.game.food[coord] = self
+
+    def on_render(self,screen):
+        pygame.draw.circle(screen, [150, 50, 49],
+                           [int(self.coord[0]*PIXELS_PER_GRID+PIXELS_PER_GRID/2), int(self.coord[1]*PIXELS_PER_GRID+PIXELS_PER_GRID/2)],
+                           int(PIXELS_PER_GRID/2))
 
 class Game:
     def __init__(self, gridSize):
@@ -95,6 +106,9 @@ class Game:
 
         self.ticksPassed = 0
         self.deltaTicks = 0
+        self.food = {}
+
+        Food(self, (5,5))
 
     def on_init(self):
         pygame.init()
@@ -123,6 +137,9 @@ class Game:
                         return otherSnake
 
         return False
+    def snakeCollisioFood(self):
+
+
 
     def on_event(self, event):
         if event.type == pygame.QUIT:
@@ -164,6 +181,9 @@ class Game:
         for i in self.otherSnakes:
             i.on_render(self._display_surf)
 
+        for i in self.food.values():
+            i.on_render(self._display_surf)
+
         pygame.display.flip()
 
     def on_cleanup(self):
@@ -180,6 +200,9 @@ class Game:
             self.on_render()
 
         self.on_cleanup()
+
+
+
 
 
 
