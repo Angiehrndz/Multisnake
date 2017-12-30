@@ -13,7 +13,8 @@ class Snake:
             self.chain.append(n)
 
         self.direction = startingDirection
-        self.speed = 150
+        self.nextDirection = startingDirection
+        self.speed = 500
 
         self.speedtimer = 0
 
@@ -24,6 +25,9 @@ class Snake:
             self.update()
 
     def update(self):
+
+        # Update direction
+        self.direction = self.nextDirection
 
         # Move snake body
 
@@ -71,7 +75,7 @@ class Snake:
 
     def setDirection(self, direction):
         if (self.direction - direction)%2 != 0:
-            self.direction = direction
+            self.nextDirection = direction
 
     def kill(self, killedBy = None):
         if killedBy == self:
@@ -98,7 +102,7 @@ class Game:
         self._running = True
 
         self.ownSnake = Snake(self, [10,0], 0)
-        self.otherSnakes = [Snake(self, [5,2], 0)]
+        self.otherSnakes = []#Snake(self, [5,2], 0)]
 
     def snakeCollision(self, snake):
         coordinate = snake.chain[0]
