@@ -65,6 +65,13 @@ class Snake:
         if type(collided) == Snake:
             self.kill(collided)
 
+        # Check head in food
+
+        if self.game.getFoodAt(self.chain[0]) != None:
+            self.chain.append([self.chain[-1][0], self.chain[-1][1]])
+
+
+
     def on_render(self, screen):
         for i in range(len(self.chain)):
             rect = (self.chain[i][0] * PIXELS_PER_GRID, self.chain[i][1] * PIXELS_PER_GRID, PIXELS_PER_GRID, PIXELS_PER_GRID)
@@ -137,9 +144,10 @@ class Game:
                         return otherSnake
 
         return False
-    def snakeCollisioFood(self):
 
-
+    def getFoodAt(self, coordinate):
+        coordinate = tuple(coordinate)
+        return self.food.get(coordinate, None)
 
     def on_event(self, event):
         if event.type == pygame.QUIT:
